@@ -1,6 +1,7 @@
 package com.capgemini.hackathon.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,6 +39,9 @@ public class AssessmentResult extends ResponseMessage implements Serializable{
 	}
 
 	public List<PossibleDisease> getPossibleDiseases() {
+		if(null == possibleDiseases) {
+			possibleDiseases = new ArrayList<PossibleDisease>();
+		}
 		return possibleDiseases;
 	}
 

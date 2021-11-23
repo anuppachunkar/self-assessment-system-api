@@ -1,5 +1,6 @@
 package com.capgemini.hackathon.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import com.capgemini.hackathon.filter.AuthorizationFilter;
 import com.capgemini.hackathon.model.AssessmentResult;
+import com.capgemini.hackathon.model.PossibleDisease;
 import com.capgemini.hackathon.model.UserDetails;
+import com.capgemini.hackathon.util.SelfAssessmentConstants;
 
 @Component
 public class SelfAssessmentService implements ISelfAssessmentService{
@@ -37,6 +40,16 @@ public class SelfAssessmentService implements ISelfAssessmentService{
 		results.setName(userDetails.getName());
 		results.setAge(userDetails.getAge());
 		
+		PossibleDisease possibleDisease = null;
+		
+		for(String disease : diseases) {
+			possibleDisease = new PossibleDisease();
+			possibleDisease.setDisease(disease);
+			// TODO: get the causes and Preventions and add it in response
+			possibleDisease = fetchCausesAndPreventions(possibleDisease);
+			results.getPossibleDiseases().add(possibleDisease);	
+		}
+		
 		return results;
 	}
 	
@@ -48,7 +61,8 @@ public class SelfAssessmentService implements ISelfAssessmentService{
     	map.put(3,"diabetes");
     	map.put(4,"blood_pressure");
     	map.put(5, "cardio_disease");
-    
+    	List<String> diseases = new ArrayList<String>();
+        
 		int numberOfSymptoms = symptoms.size();
 		//int diseaseCount = 
 		int[] c = new int[20];
@@ -124,9 +138,6 @@ public class SelfAssessmentService implements ISelfAssessmentService{
                          }
                          break;
                      }
-
-
-
                  }
 			}
 		}
@@ -143,9 +154,65 @@ public class SelfAssessmentService implements ISelfAssessmentService{
         
         
         logger.info("Disease Name :{}",map.get(diseaseKey));
-        
+        diseases.add(map.get(diseaseKey));
 		
-		return null;
+		return diseases;
+	}
+	
+	private PossibleDisease fetchCausesAndPreventions(PossibleDisease disease) {
+		switch (disease.getDisease()) {
+
+		case "diarrhoea": {
+			mapData(SelfAssessmentConstants.DIARRHOEA_CAUSES, SelfAssessmentConstants.DIARRHOEA_PREVENTION, disease);
+			break;
+		}
+
+		case "malaria": {
+			mapData(SelfAssessmentConstants.MALERIA_CAUSES, SelfAssessmentConstants.MALERIA_PREVENTION, disease);
+			break;
+		}
+		case "typhoid": {
+			mapData(SelfAssessmentConstants.TYPHOID_CAUSES, SelfAssessmentConstants.TYPHOID_PREVENTION, disease);
+			break;
+		}
+
+		case "diabetes": {
+			mapData(SelfAssessmentConstants.DIABETES_CAUSES, SelfAssessmentConstants.DIABETES_PREVENTION, disease);
+			break;
+		}
+
+		case "blood_pressure": {
+			mapData(SelfAssessmentConstants.BLOOD_PRESSURE_CAUSES, SelfAssessmentConstants.BLOOD_PRESSURE_PREVENTION, disease);
+			break;
+		}
+
+		case "cardio_disease": {
+			mapData(SelfAssessmentConstants.CARDIO_DISEASE_CAUSES, SelfAssessmentConstants.CARDIO_DISEASE_PREVENTION, disease);
+			break;
+		}
+
+		}
+		return disease;
+
+	}
+	
+	private PossibleDisease mapData(String causes, String preventions, PossibleDisease possibleDisease) {
+		List<String> causesList = new ArrayList<String>();
+		List<String> preventionsList = new ArrayList<String>();
+		
+		
+		String[] cList= causes.split("\\|");
+		String[] pList = preventions.split("\\|");
+		
+		for(String cause : cList) {
+			causesList.add(cause);
+		}
+		for(String prevention : pList) {
+			preventionsList.add(prevention);
+		}
+		possibleDisease.setCauses(causesList);
+		possibleDisease.setPrevention(preventionsList);
+		return possibleDisease;
 	}
 
 	
