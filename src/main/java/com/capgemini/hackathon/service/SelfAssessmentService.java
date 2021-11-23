@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.capgemini.hackathon.filter.AuthorizationFilter;
 import com.capgemini.hackathon.model.AssessmentResult;
 import com.capgemini.hackathon.model.UserDetails;
 
@@ -22,27 +25,29 @@ public class SelfAssessmentService implements ISelfAssessmentService{
         String blood_pressure[] = {"Headaches","Blurred Vision","Chest Pain","Shortness in Breath","Dizziness","Nausea","Vomiting"};
         String cardio_disease[] = {"Shortness in Breath","Fast Heartbeat","Indigestion","Pressure Or Heaviness In Chest","Anxiety"};
         Map<Integer, String> map = new HashMap<>();
-        
+        private static Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
         
 	@Override
 	public AssessmentResult retrieveAssessmentResult(UserDetails userDetails) {
 		// TODO Auto-generated method stub
+		logger.info("Inside retrieveAssessmentResult");
 		AssessmentResult results = new AssessmentResult();
 		
+		List<String> diseases = evaluate(userDetails.getSymptoms());
+		results.setName(userDetails.getName());
+		results.setAge(userDetails.getAge());
 		
-		
-		
-		return null;
+		return results;
 	}
 	
 	public List<String> evaluate(List<String> symptoms){
-	
-		map.put(1,"diarrhoea");
-    	map.put(2,"malaria");
-    	map.put(3,"typhoid");
-    	map.put(4,"diabetes");
-    	map.put(5,"blood_pressure");
-    	map.put(6, "cardio_disease");
+		logger.info("Inside evaluate");
+		map.put(0,"diarrhoea");
+    	map.put(1,"malaria");
+    	map.put(2,"typhoid");
+    	map.put(3,"diabetes");
+    	map.put(4,"blood_pressure");
+    	map.put(5, "cardio_disease");
     
 		int numberOfSymptoms = symptoms.size();
 		//int diseaseCount = 
@@ -126,9 +131,19 @@ public class SelfAssessmentService implements ISelfAssessmentService{
 			}
 		}
 		
- 				
-		
-		
+		int max = c[0];
+		int diseaseKey = 0;
+        for( int m=0; m<6 ; m++)
+        {
+            if(c[m] > max) {
+                max = c[m];
+                diseaseKey = m;
+            }
+        }
+        
+        
+        logger.info("Disease Name :{}",map.get(diseaseKey));
+        
 		
 		return null;
 	}
